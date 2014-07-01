@@ -96,14 +96,14 @@ for(i=0;i<100;i++) {
 	printf("motor rad is %d \n",(int32_t)motor_rad); 
 	err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
 	printf("pos left = %d \n",pos_left ); 
-	err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
-	printf("2 pos left = %d \n",pos_left ); 
 	if(err != 0)
 	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
 	sleep(2);
 
 	motor_rad =(3.14159);
 	err = epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID,(295*4000/(2*3.14159))*motor_rad);
+	err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
+	printf("2 pos left = %d \n",pos_left ); 
 	if(err != 0)
 	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
 	sleep(2); 

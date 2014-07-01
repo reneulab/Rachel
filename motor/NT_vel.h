@@ -9,14 +9,8 @@
  * \param vel [mm/sec]
  * \return success/error
  */
-int32_t vel_set_speed_left(int32_t vel);
+int32_t vel_set_speed_node(int32_t id,int32_t vel);
 
-
-/**
- * \param vel [mm/sec]
- * \return success/error
- */
-int32_t vel_set_speed_right(int32_t vel);
 
 /**
  * Alternative to vel_set_speed_right/left
@@ -24,9 +18,9 @@ int32_t vel_set_speed_right(int32_t vel);
  * \param v_d Robot rotation [milli-rad/sec]
  * \return success/error
  */
-int32_t vel_set_speed(int32_t movement, int32_t rotation);
+int32_t vel_set_speed(int32_t id,int32_t movement, int32_t rotation);
 
-int32_t vel_halt(void);
+//int32_t vel_halt(void);
 
 
 /**

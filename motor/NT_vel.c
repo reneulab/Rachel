@@ -24,22 +24,16 @@ static int32_t _vel_speed(int32_t vel, uint16_t nodeid) {
 }
 
 
-int32_t vel_set_speed_left(int32_t vel) {
-	return _vel_speed(-vel, MOTOR_EPOS_L_ID);
+int32_t vel_set_speed_node(int32_t id,int32_t vel) {
+	return _vel_speed(-vel, id);
 }
 
-
-int32_t vel_set_speed_right(int32_t vel) {
-	return _vel_speed(vel, MOTOR_EPOS_R_ID);
-}
-
-int32_t vel_set_speed(int32_t movement, int32_t rotation) {
+int32_t vel_set_speed(int32_t id,int32_t movement, int32_t rotation) {
 	int32_t err = 0;
 	double w = rotation/1000.0; // Remove milli
 	int32_t v_r = movement + w*MOTOR_WHEELBASE_RADIUS;
-	int32_t v_l = movement - w*MOTOR_WHEELBASE_RADIUS;
-	err |= vel_set_speed_right(v_r);
-	err |= vel_set_speed_left(v_l);
+//	int32_t v_l = movement - w*MOTOR_WHEELBASE_RADIUS;
+	err |= vel_set_speed_node(id,v_r);
 	return err;
 }
 
@@ -59,19 +53,19 @@ int32_t vel_read(int32_t* pos_left, int32_t* vel_left, int32_t* pos_right,
 
 	uint32_t enc, rpm;
 	switch(f.id) {
-		case(PDO_TX1_ID + MOTOR_EPOS_R_ID):
+		case(PDO_TX1_ID + 3):
 			status = (f.data[0]<<0) | (f.data[1]<<8);
 			break;
-		case(PDO_TX1_ID + MOTOR_EPOS_L_ID):
+		case(PDO_TX1_ID + 2):
 			status = (f.data[0]<<0) | (f.data[1]<<8);
 			break;
-		case(PDO_TX2_ID + MOTOR_EPOS_R_ID):
+		case(PDO_TX2_ID + 3):
 			enc = ((uint32_t)f.data[0]<<0) | ((uint32_t)f.data[1]<<8) | ((uint32_t)f.data[2]<<16) | ((uint32_t)f.data[3]<<24);
 			rpm = ((uint32_t)f.data[4]<<0) | ((uint32_t)f.data[5]<<8) | ((uint32_t)f.data[6]<<16) | ((uint32_t)f.data[7]<<24);
 			*pos_right = motor_enc_to_mm(enc);
 			*vel_right = motor_rpm_to_mmsec(rpm);
 			break;
-		case(PDO_TX2_ID + MOTOR_EPOS_L_ID):
+		case(PDO_TX2_ID + 2):
 			enc = ((uint32_t)f.data[0]<<0) | ((uint32_t)f.data[1]<<8) | ((uint32_t)f.data[2]<<16) | ((uint32_t)f.data[3]<<24);
 			rpm = ((uint32_t)f.data[4]<<0) | ((uint32_t)f.data[5]<<8) | ((uint32_t)f.data[6]<<16) | ((uint32_t)f.data[7]<<24);
 			*pos_left = motor_enc_to_mm(-enc);
