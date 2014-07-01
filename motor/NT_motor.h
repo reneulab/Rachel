@@ -4,9 +4,9 @@
 #include <inttypes.h>
 
 /*** CAN-bus spesific ***/
-#define MOTOR_PC_ID     0x01
-#define MOTOR_EPOS_L_ID 0x02
-#define MOTOR_EPOS_R_ID 0x03
+//#define MOTOR_PC_ID     0x01
+//#define MOTOR_EPOS_L_ID 0x02
+//#define MOTOR_EPOS_R_ID 0x03
 
 
 /*** Robot specific ***/

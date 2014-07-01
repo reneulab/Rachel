@@ -18,8 +18,8 @@
 #include <stdbool.h>
 #define TIMEOUT 1000
 /*************** 1 for connected, 0 for not connected ***************/
-#define LEFT  	1
-#define RIGHT	0
+#define LEFT  	2
+#define RIGHT	3
 
 /**************** Left ID:2	Right ID:3	PC ID:1  ****** */
 
@@ -36,24 +36,20 @@ int main(void) {
 	int32_t pos_right = 1234;
 	int32_t vel_right = 1234;
 
-	int32_t pdo_filters[5] = {
-				0x04,
-				PDO_TX1_ID + MOTOR_EPOS_R_ID,
-				PDO_TX2_ID + MOTOR_EPOS_R_ID,
-				PDO_TX1_ID + MOTOR_EPOS_L_ID,
-				PDO_TX2_ID + MOTOR_EPOS_L_ID
+	int32_t pdo_filters[3] = {
+				0x03,
+				PDO_TX1_ID + LEFT,
+				PDO_TX2_ID + LEFT
 			};		
 		
-	int32_t cfg_filters[6] = {
-				0x06,
+	int32_t cfg_filters[4] = {
+				0x04,
 				0x00,
-				NMT_TX + MOTOR_EPOS_R_ID,
-				SDO_TX + MOTOR_EPOS_R_ID,
-				NMT_TX + MOTOR_EPOS_L_ID,
-				SDO_TX + MOTOR_EPOS_L_ID
+				NMT_TX + LEFT,
+				SDO_TX + LEFT
 			};	
 	
-	int32_t id[3] = {0x03,2,3}; 
+	int32_t id[2] = {0x02,2}; 
 
 	printf("                                     Starting!\n");
 
@@ -61,7 +57,7 @@ int main(void) {
 	if( err != 0) 
 	   { printf("ERROR ON INIT %d \n",err); }
 	printf("                                     Init!\n");
-	sleep(1);
+	sleep(8);
 /**********************************************************************/
 	err = motor_enable(id);
 	if(err != 0)
@@ -71,7 +67,7 @@ int main(void) {
 /********************************************************************/
 	sleep(2);
 	motor_rad =(3.14159/2);
-	err = epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID,(295*4000/(2*3.14159))*motor_rad);
+	err = epos_Position_Mode_Setting_Value(LEFT,(295*4000/(2*3.14159))*motor_rad);
 	if(err != 0)
 	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
 	sleep(2);  
@@ -101,7 +97,8 @@ for(i=0;i<100;i++) {
 	sleep(2);
 
 	motor_rad =(3.14159);
-	err = epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID,(295*4000/(2*3.14159))*motor_rad);
+	err = epos_Position_Mode_Setting_Value(LEFT,(295*4000/(2*3.14159))*motor_rad);
+	printf("err here %d \n",err); 
 	err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
 	printf("2 pos left = %d \n",pos_left ); 
 	if(err != 0)

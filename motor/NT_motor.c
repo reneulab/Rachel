@@ -7,7 +7,7 @@
 #include "canopen/NT_PDO.h"
 #include "canopen/ntcan.h"
 
-
+#include <time.h>
 #include <math.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -162,7 +162,8 @@ int32_t motor_enable(int32_t id[]) {
 	for(i=1;i<id[0];i++) {
 		// switch_on_disabled -> switch_on_enabled
 		err |= epos_Controlword(id[i], Shutdown); 
-	}
+	}	
+	sleep(1); 
 	for(i=1;i<id[0];i++) {
 		err |= epos_Controlword(id[i], Switch_On_And_Enable_Operation);
 	}
