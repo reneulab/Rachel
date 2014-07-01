@@ -71,7 +71,7 @@ int32_t motor_disable(void);
  * Sets the opperation mode (Velocity or Position)
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_setmode(enum Motor_mode mode);
+//int32_t motor_setmode(enum Motor_mode mode);
 
 
 int32_t motor_position(int32_t pos_l, int32_t pos_r);

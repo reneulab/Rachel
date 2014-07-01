@@ -126,14 +126,15 @@ int32_t motor_init(int32_t id[],int32_t pdo_filters[],int32_t cfg_filters[]) {
         return MOTOR_ERROR;
  	}
 
-// Set the default mode
-	motor_setmode(Motor_mode_Position);
-	if (err != 0) {
-		printf("Error in set mode \n`"); 
-		return MOTOR_ERROR;        
-	}
 
 	for(i=1;i<id[0];i++) {
+		// Set the default mode
+		err |= epos_Modes_of_Operation(id[i], Motor_mode_Position);
+		if (err != 0) {
+			printf("Error in set mode node: %d \n",id[i]); 
+			return MOTOR_ERROR;        
+		}
+		// configure each node	
 		err |= motor_config_node(id[i]);
 		if (err != 0) {
 			printf("Error in config node: %d \n",id[i]); 
@@ -194,13 +195,14 @@ int motor_halt(void) {
 }
 
 
-int motor_setmode(enum Motor_mode mode) {
+/*int motor_setmode(int32_t id[],enum Motor_mode mode) {
 	int err = 0;
+	
 	err |= epos_Modes_of_Operation(MOTOR_EPOS_L_ID, mode);
     err |= epos_Modes_of_Operation(MOTOR_EPOS_R_ID, mode);
 	return err;
 }
-
+*/
 
 int motor_position(int32_t pos_l, int32_t pos_r)
 {
