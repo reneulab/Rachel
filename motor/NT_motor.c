@@ -154,41 +154,48 @@ int32_t  motor_close(int32_t pdo_filters[],int32_t cfg_filters[]) {
 }
 
 
-int32_t motor_enable(void) {
+int32_t motor_enable(int32_t id[]) {
 	int err = 0;
-
+	int8_t i = 0;
+	
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Shutdown); // switch_on_disabled -> switch_on_enabled
-   	err |= epos_Controlword(MOTOR_EPOS_R_ID, Shutdown);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Switch_On_And_Enable_Operation);
-    err |= epos_Controlword(MOTOR_EPOS_R_ID, Switch_On_And_Enable_Operation);
-
+	for(i=1;i<id[0];i++) {
+		// switch_on_disabled -> switch_on_enabled
+		err |= epos_Controlword(id[i], Shutdown); 
+	}
+	for(i=1;i<id[0];i++) {
+		err |= epos_Controlword(id[i], Switch_On_And_Enable_Operation);
+	}
 	// Open PDO-communication
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Start_Node);
 	return err;
 }
 
 
-int32_t motor_disable(void) {
+int32_t motor_disable(int32_t id[]) {
 	int err = 0;
+	int8_t i = 0; 
 
 	// Stop PDO-communication
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Disable_Voltage);
-  	err |= epos_Controlword(MOTOR_EPOS_R_ID, Disable_Voltage);
+	for(i=1;i<id[0];i++) {
+		err |= epos_Controlword(id[i], Disable_Voltage);
+	}	
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Stop_Node);
 
 	return err;
 }
 
 
-int motor_halt(void) {
+int motor_halt(int32_t id[]) {
 	int err = 0;
+	int8_t i = 0; 
 
 	// Stop PDO-communication
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Quickstop);
-  	err |= epos_Controlword(MOTOR_EPOS_R_ID, Quickstop);
+	for(i=1;i<id[0];i++) {
+		err |= epos_Controlword(id[i], Quickstop);
+	}  	
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Stop_Node);
 
 	return err;
@@ -204,14 +211,14 @@ int motor_halt(void) {
 }
 */
 
-int motor_position(int32_t pos_l, int32_t pos_r)
+/*int motor_position(int32_t pos_l, int32_t pos_r)
 {
 	int err = 0;
 	err |=  epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID, pos_l);
 	err |=  epos_Position_Mode_Setting_Value(MOTOR_EPOS_R_ID, pos_r);
 	return err;
 }
-
+*/
 
 /********* Utils: *********/
 int motor_mmsec_to_rpm(int mm_per_sec) {

@@ -51,21 +51,21 @@ int32_t motor_close(int32_t pdo_filters[],int32_t cfg_filters[]);
  * Turns the motors on
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_enable(void);
+int32_t motor_enable(int32_t id[]);
 
 
 /*!
  * Stops the motors as quickly as possible, and holds them there.
  * Run motor_enable() to re-enable the controller.
  */
-int32_t motor_halt(void);
+int32_t motor_halt(int32_t id[]);
 
 
 /*!
  * Turns the motors off (no power).
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_disable(void);
+int32_t motor_disable(int32_t id[]);
 
 /*!
  * Sets the opperation mode (Velocity or Position)
@@ -74,7 +74,7 @@ int32_t motor_disable(void);
 //int32_t motor_setmode(enum Motor_mode mode);
 
 
-int32_t motor_position(int32_t pos_l, int32_t pos_r);
+//int32_t motor_position(int32_t pos_l, int32_t pos_r);
 
 //void motor_read_position(uint32_t32_t *pos_l, uint32_t *pos_r);
 
