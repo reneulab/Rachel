@@ -21,7 +21,7 @@ int32_t motor_cfg_handle; //!< Configuration CAN-connection.
 
 
 static int motor_config_node(uint16_t node) {
-	int err = 0;
+	int8_t err = 0;
 	int num_PDOs;
 
 	// Set Configuration parameters
@@ -95,26 +95,8 @@ static int motor_config_node(uint16_t node) {
 }
 
 
-int32_t motor_init(void) {
-	int err = 0;
-
-// Open two connections to the CAN-network
-    int32_t pdo_filters[5] = {
-		0x05, //number of elements in array
-        (PDO_TX1_ID + MOTOR_EPOS_L_ID),
-        (PDO_TX2_ID + MOTOR_EPOS_L_ID),
-		(PDO_TX1_ID + MOTOR_EPOS_R_ID),
-		(PDO_TX2_ID + MOTOR_EPOS_R_ID) 
-	};
-
-    int32_t cfg_filters[6] = {
-		0x06, //number of elements in array
-		0x00,
-        (NMT_TX + MOTOR_EPOS_L_ID),
-        (SDO_TX + MOTOR_EPOS_L_ID),
-        (NMT_TX + MOTOR_EPOS_R_ID),
-        (SDO_TX + MOTOR_EPOS_R_ID)
-	};
+int32_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[],int32_t id[]) {
+	int8_t err = 0;
 
 // NTCAN STUFF //
 	motor_pdo_handle = initNTCAN(NTCAN_BAUD_1000, 
@@ -148,41 +130,21 @@ int32_t motor_init(void) {
 		printf("Error in set mode \n`"); 
 		return MOTOR_ERROR;        
 	}
-	
-	err |= motor_config_node(MOTOR_EPOS_L_ID);
-	if (err != 0) {
-		printf("Error in Left config node \n`"); 
-		return MOTOR_ERROR;        
-	}
 
-  	err |= motor_config_node(MOTOR_EPOS_R_ID);
-	if (err != 0) {
-		printf("Error in Right config node \n`"); 
-		return MOTOR_ERROR;
+	for(i=1;i<id[0];i++) { 
+		err |= motor_config_node(id[i]); 
+		if (err != 0) {
+			printf("Error in config node %d \n",i); 
+			return MOTOR_ERROR;        
+		}
 	}
 
 	return 0;
 }
 
 
-int32_t  motor_close(void) {
-	int32_t err = 0; 
-	int32_t pdo_filters[5] = {
-		0x05, // number of elements in array   	
-		(PDO_TX1_ID + MOTOR_EPOS_R_ID),
-       	(PDO_TX2_ID + MOTOR_EPOS_R_ID),
-		(PDO_TX1_ID + MOTOR_EPOS_L_ID),
-		(PDO_TX2_ID + MOTOR_EPOS_L_ID)
-		};
-
-    int32_t cfg_filters[6] = {
-		0x06, // number of elements in array
-		0x00,
-       	NMT_TX + MOTOR_EPOS_R_ID,
-       	SDO_TX + MOTOR_EPOS_R_ID,
-       	NMT_TX + MOTOR_EPOS_L_ID,
-       	SDO_TX + MOTOR_EPOS_L_ID
-	};
+int32_t  motor_close(int32_t pdo_filters[],int32_t cfg_filters[]) {
+	int32_t err = 0;
 
 	err |= closeNTCAN(motor_pdo_handle,pdo_filters);
 	err |= closeNTCAN(motor_cfg_handle,cfg_filters);
@@ -190,14 +152,19 @@ int32_t  motor_close(void) {
 }
 
 
-int32_t motor_enable(void) {
-	int err = 0;
+int8_t motor_enable(int32_t id[]) {
+	int8_terr = 0;
 
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Shutdown); // switch_on_disabled -> switch_on_enabled
-   	err |= epos_Controlword(MOTOR_EPOS_R_ID, Shutdown);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Switch_On_And_Enable_Operation);
-    err |= epos_Controlword(MOTOR_EPOS_R_ID, Switch_On_And_Enable_Operation);
+	
+	for(i=1;i<id[0];i++) { 
+		err |= epos_Controlword(id[i], Shutdown); // switch_on_disabled -> switch_on_enabled
+		err |= epos_Controlword(id[i], Switch_On_And_Enable_Operation);
+		if(err != 0) { 
+			printf("Error in enable node %d \n",i);
+			return -1; 
+		}
+	} 
 
 	// Open PDO-communication
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Start_Node);
@@ -205,45 +172,56 @@ int32_t motor_enable(void) {
 }
 
 
-int32_t motor_disable(void) {
-	int err = 0;
+int8_t motor_disable(int32_t id[]) {
+	int8_terr = 0;
 
 	// Stop PDO-communication
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Disable_Voltage);
-  	err |= epos_Controlword(MOTOR_EPOS_R_ID, Disable_Voltage);
+	
+	for(i=1;i<id[0];i++) { 
+		err |= epos_Controlword(id[i], Disable_Voltage);
+	}
+	
+	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Stop_Node);
+	return err;
+}
+
+
+int8_t motor_halt(int32_t id[]) {
+	int8_terr = 0;
+
+	// Stop PDO-communication
+	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
+	
+	for(i=1;i<id[0];i++) { 
+		err |= epos_Controlword(id[i], Quickstop);
+	}
+	
 	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Stop_Node);
 
 	return err;
 }
 
 
-int motor_halt(void) {
-	int err = 0;
-
-	// Stop PDO-communication
-	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Enter_PreOperational);
-	err |= epos_Controlword(MOTOR_EPOS_L_ID, Quickstop);
-  	err |= epos_Controlword(MOTOR_EPOS_R_ID, Quickstop);
-	err |= NMT_change_state(motor_cfg_handle, CANOPEN_BROADCAST_ID, NMT_Stop_Node);
-
+int8_t motor_setmode(int32_t id[],enum Motor_mode mode) {
+	int8_terr = 0;
+	
+	for(i=1;i<id[0];i++) { 
+		err |= epos_Modes_of_Operation(id[i], mode);
+	}
+	
 	return err;
 }
 
 
-int motor_setmode(enum Motor_mode mode) {
-	int err = 0;
-	err |= epos_Modes_of_Operation(MOTOR_EPOS_L_ID, mode);
-    err |= epos_Modes_of_Operation(MOTOR_EPOS_R_ID, mode);
-	return err;
-}
-
-
-int motor_position(int32_t pos_l, int32_t pos_r)
+int8_t motor_position(int32_t id[], int32_t pos[])
 {
-	int err = 0;
-	err |=  epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID, pos_l);
-	err |=  epos_Position_Mode_Setting_Value(MOTOR_EPOS_R_ID, pos_r);
+	int8_terr = 0;
+	
+	for(i=1;i<id[0];i++) {
+		err |=  epos_Position_Mode_Setting_Value(id[i],pos[i-1]);
+	}
+
 	return err;
 }
 

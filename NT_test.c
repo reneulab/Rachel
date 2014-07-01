@@ -1,23 +1,25 @@
-#include "NT_test.h"
-#include "motor/NT_motor.h"
-#include "motor/NT_pos.h"
-#include "motor/NT_vel.h"
-#include "motor/epos.h"
-
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <inttypes.h>
 #include <stdbool.h>
+
+#include "NT_test.h"
+#include "motor/NT_motor.h"
+#include "motor/NT_pos.h"
+#include "motor/NT_vel.h"
+#include "motor/epos.h"
+
 #define TIMEOUT 1000
-/*************** 1 for connected, 0 for not connected ***************/
-#define LEFT  	1
-#define RIGHT	0
 
-/**************** Left ID:2	Right ID:3	PC ID:1  ****** */
+#define NODE  	2
+#define PDO_TX1_ID  0x180
+#define PDO_TX2_ID  0x180
+#define NMT_TX 0x700
+#define SDO_TX 0x580
 
-int main(void) {
+int32_t main(void) {
 	
 	int32_t err;
 	double motor_rad = 0;
@@ -29,16 +31,26 @@ int main(void) {
 	int32_t vel_left =  1234;
 	int32_t pos_right = 1234;
 	int32_t vel_right = 1234;
+	int32_t pdo_filters[3] = 
+				{ 0x03,
+				  PDO_TX1_ID + NODE, 
+				  PDO_TX2_ID + NODE	};  
+	int32_t cfg_filters[4] = 
+				{ 0x04, 0x00,
+				  NMT_TX + NODE,
+				  SDO_TX + NODE }; 
+
+	int32_t id[2] = {1,NODE}; 
 
 	printf("                                     Starting!\n");
 
-	err = motor_init();
+	err = motor_init(pdo_filters,cfg_filters,id);
 	if( err != 0) 
 	   { printf("ERROR ON INIT %d \n",err); }
 	printf("                                     Init!\n");
 	sleep(1);
 /**********************************************************************/
-	err = motor_enable();
+	err = motor_enable(id);
 	if(err != 0)
 	   { printf("ERROR ON ENABLE %d \n",err); }
 	sleep(1);
@@ -46,7 +58,7 @@ int main(void) {
 /********************************************************************/
 	sleep(2);
 	motor_rad =(3.14159/2);
-	err = epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID,(295*4000/(2*3.14159))*motor_rad);
+	err = epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
 	if(err != 0)
 	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
 	sleep(4);  
@@ -80,19 +92,19 @@ for(i=0;i<100;i++) {
 /*******************************************************************************/
 	printf("                                     Ending! \n");
 	printf(" HALT \n  ");
-	err = motor_halt();
+	err = motor_halt(id);
 	if(err !=0 )
 		{ printf("Error on HALT %d \n",err); }
 	sleep(2);
 
-	err = motor_disable();
+	err = motor_disable(id);
 	printf(" DISABLE \n"); 	
 	if(err != 0) 
 	   	{ printf("error on disable %d \n",err); }
 	sleep(4);
 
 	printf(" CLOSE \n"); 
-	err = motor_close();
+	err = motor_close(pdo_filters,cfg_filters);
 	if(err != 0) 
 	   	{ printf("ERROR ON CLOSE %d \n",err); }
 	sleep(2);

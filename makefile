@@ -1,6 +1,6 @@
 C=gcc
-CFLAGS=-Wall
-LDFLAGS=-ldl
+CFLAGS= -std=gnu99 -fPIC -Wall -Wextra -Wno-unused -I .
+LDFLAGS= -std=gnu99 -L -ldl .
 OBJ=NT_test.o NT_motor.o epos.o NT_pos.o NT_vel.o myCan.o NT_NMT.o NT_SDO.o NT_PDO.o printd.o  
 CAN_OBJ=motor/canopen/myCan.h motor/canopen/myCan.c
 OPEN_OBJ= motor/canopen/canopen.h

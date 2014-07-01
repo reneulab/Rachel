@@ -4,9 +4,9 @@
 #include <inttypes.h>
 
 /*** CAN-bus spesific ***/
-#define MOTOR_PC_ID     0x01
-#define MOTOR_EPOS_L_ID 0x02
-#define MOTOR_EPOS_R_ID 0x03
+//#define MOTOR_PC_ID     0x01
+//#define MOTOR_EPOS_L_ID 0x02
+//#define MOTOR_EPOS_R_ID 0x03
 
 
 /*** Robot specific ***/
@@ -35,51 +35,47 @@ enum Motor_mode {
 };
 
 
-extern int32_t motor_pdo_fd;
-extern int32_t motor_cfg_fd;
-
 /*!
  * Opens the can connection,
  * and configures the two motors
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_init(void);
+int8_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[],int32_t id[]);
 
 
 /*! Closes the CAN connection */
-int32_t motor_close(void);
+int8_t motor_close(int32_t pdo_filters[],int32_t cfg_filters[]);
 
 
 /*!
  * Turns the motors on
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_enable(void);
+int8_t motor_enable(int32_t id[]);
 
 
 /*!
  * Stops the motors as quickly as possible, and holds them there.
  * Run motor_enable() to re-enable the controller.
  */
-int32_t motor_halt(void);
+int8_t motor_halt(int32_t id[]);
 
 
 /*!
  * Turns the motors off (no power).
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_disable(void);
+int8_t motor_disable(int32_t id[]);
 
 /*!
  * Sets the opperation mode (Velocity or Position)
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_setmode(enum Motor_mode mode);
+int8_t motor_setmode(int32_t id[],enum Motor_mode mode);
 
 
-int32_t motor_position(int32_t pos_l, int32_t pos_r);
+int8_t motor_position(int32_t id[],int32_t pos[])
 
-//void motor_read_position(uint32_t32_t *pos_l, uint32_t *pos_r);
 
 /*
  * For int32_ternal use in the driver.
