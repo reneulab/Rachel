@@ -63,7 +63,7 @@ int main(void) {
 	printf("                                     Init!\n");
 	sleep(1);
 /**********************************************************************/
-	err = motor_enable(id);
+	err = motor_enable();
 	if(err != 0)
 	   { printf("ERROR ON ENABLE %d \n",err); }
 	sleep(1);
@@ -110,12 +110,12 @@ for(i=0;i<100;i++) {
 /*******************************************************************************/
 	printf("                                     Ending! \n");
 	printf(" HALT \n  ");
-//	err = motor_halt(id);
+	err = motor_halt();
 	if(err !=0 )
 		{ printf("Error on HALT %d \n",err); }
 	sleep(2);
 
-	err = motor_disable(id);
+	err = motor_disable();
 	printf(" DISABLE \n"); 	
 	if(err != 0) 
 	   	{ printf("error on disable %d \n",err); }
