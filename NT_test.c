@@ -3,6 +3,12 @@
 #include "motor/NT_pos.h"
 #include "motor/NT_vel.h"
 #include "motor/epos.h"
+#include "motor/canopen/NT_NMT.h"
+#include "motor/canopen/NT_SDO.h"
+#include "motor/canopen/NT_PDO.h"
+
+
+
 
 #include <time.h>
 #include <stdlib.h>
@@ -16,7 +22,7 @@
 #define RIGHT	0
 
 /**************** Left ID:2	Right ID:3	PC ID:1  ****** */
-//git test 
+
 int main(void) {
 	
 	int32_t err;
@@ -30,9 +36,26 @@ int main(void) {
 	int32_t pos_right = 1234;
 	int32_t vel_right = 1234;
 
+	int32_t pdo_filters[5] = {
+				0x04,
+				PDO_TX1_ID + MOTOR_EPOS_R_ID,
+				PDO_TX2_ID + MOTOR_EPOS_R_ID,
+				PDO_TX1_ID + MOTOR_EPOS_L_ID,
+				PDO_TX2_ID + MOTOR_EPOS_L_ID
+			};		
+		
+	int32_t cfg_filters[6] = {
+				0x06,
+				0x00,
+				NMT_TX + MOTOR_EPOS_R_ID,
+				SDO_TX + MOTOR_EPOS_R_ID,
+				NMT_TX + MOTOR_EPOS_L_ID,
+				SDO_TX + MOTOR_EPOS_L_ID
+			};	
+
 	printf("                                     Starting!\n");
 
-	err = motor_init();
+	err = motor_init(pdo_filters,cfg_filters);
 	if( err != 0) 
 	   { printf("ERROR ON INIT %d \n",err); }
 	printf("                                     Init!\n");
@@ -49,7 +72,7 @@ int main(void) {
 	err = epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID,(295*4000/(2*3.14159))*motor_rad);
 	if(err != 0)
 	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
-	sleep(4);  
+	sleep(2);  
 /*****************************/
 /*	clock_gettime(CLOCK_REALTIME,&tms); 
 	timeB = tms.tv_sec *1000000; 
@@ -77,6 +100,11 @@ for(i=0;i<100;i++) {
 	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
 	sleep(2);
 
+	motor_rad =(3.14159);
+	err = epos_Position_Mode_Setting_Value(MOTOR_EPOS_L_ID,(295*4000/(2*3.14159))*motor_rad);
+	if(err != 0)
+	   	{ printf("ERROR ON MODE VALUE %d \n",err); }
+	sleep(2); 
 /*******************************************************************************/
 	printf("                                     Ending! \n");
 	printf(" HALT \n  ");
@@ -92,7 +120,7 @@ for(i=0;i<100;i++) {
 	sleep(4);
 
 	printf(" CLOSE \n"); 
-	err = motor_close();
+	err = motor_close(pdo_filters,cfg_filters);
 	if(err != 0) 
 	   	{ printf("ERROR ON CLOSE %d \n",err); }
 	sleep(2);

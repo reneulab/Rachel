@@ -95,26 +95,10 @@ static int motor_config_node(uint16_t node) {
 }
 
 
-int32_t motor_init(void) {
+int32_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[]) {
 	int err = 0;
 
-// Open two connections to the CAN-network
-    int32_t pdo_filters[5] = {
-		0x05, //number of elements in array
-        (PDO_TX1_ID + MOTOR_EPOS_L_ID),
-        (PDO_TX2_ID + MOTOR_EPOS_L_ID),
-		(PDO_TX1_ID + MOTOR_EPOS_R_ID),
-		(PDO_TX2_ID + MOTOR_EPOS_R_ID) 
-	};
 
-    int32_t cfg_filters[6] = {
-		0x06, //number of elements in array
-		0x00,
-        (NMT_TX + MOTOR_EPOS_L_ID),
-        (SDO_TX + MOTOR_EPOS_L_ID),
-        (NMT_TX + MOTOR_EPOS_R_ID),
-        (SDO_TX + MOTOR_EPOS_R_ID)
-	};
 
 // NTCAN STUFF //
 	motor_pdo_handle = initNTCAN(NTCAN_BAUD_1000, 
@@ -165,24 +149,8 @@ int32_t motor_init(void) {
 }
 
 
-int32_t  motor_close(void) {
+int32_t  motor_close(int32_t pdo_filters[],int32_t cfg_filters[]) {
 	int32_t err = 0; 
-	int32_t pdo_filters[5] = {
-		0x05, // number of elements in array   	
-		(PDO_TX1_ID + MOTOR_EPOS_R_ID),
-       	(PDO_TX2_ID + MOTOR_EPOS_R_ID),
-		(PDO_TX1_ID + MOTOR_EPOS_L_ID),
-		(PDO_TX2_ID + MOTOR_EPOS_L_ID)
-		};
-
-    int32_t cfg_filters[6] = {
-		0x06, // number of elements in array
-		0x00,
-       	NMT_TX + MOTOR_EPOS_R_ID,
-       	SDO_TX + MOTOR_EPOS_R_ID,
-       	NMT_TX + MOTOR_EPOS_L_ID,
-       	SDO_TX + MOTOR_EPOS_L_ID
-	};
 
 	err |= closeNTCAN(motor_pdo_handle,pdo_filters);
 	err |= closeNTCAN(motor_cfg_handle,cfg_filters);

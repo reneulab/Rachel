@@ -35,19 +35,16 @@ enum Motor_mode {
 };
 
 
-extern int32_t motor_pdo_fd;
-extern int32_t motor_cfg_fd;
-
 /*!
  * Opens the can connection,
  * and configures the two motors
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_init(void);
+int32_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[]);
 
 
 /*! Closes the CAN connection */
-int32_t motor_close(void);
+int32_t motor_close(int32_t pdo_filters[],int32_t cfg_filters[]);
 
 
 /*!
