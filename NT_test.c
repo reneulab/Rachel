@@ -12,7 +12,7 @@
 #include "motor/epos.h"
 
 #define TIMEOUT 1000
-
+//test 1
 #define NODE  	2
 #define PDO_TX1_ID  0x180
 #define PDO_TX2_ID  0x180
