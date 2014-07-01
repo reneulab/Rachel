@@ -40,7 +40,7 @@ enum Motor_mode {
  * and configures the two motors
  * \return 0 on success, MOTOR_ERROR (-1) on error
  */
-int32_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[]);
+int32_t motor_init(int32_t id[],int32_t pdo_filters[],int32_t cfg_filters[]);
 
 
 /*! Closes the CAN connection */

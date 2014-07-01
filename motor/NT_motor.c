@@ -95,9 +95,9 @@ static int motor_config_node(uint16_t node) {
 }
 
 
-int32_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[]) {
-	int err = 0;
-
+int32_t motor_init(int32_t id[],int32_t pdo_filters[],int32_t cfg_filters[]) {
+	int8_t err = 0;
+	int8_t i = 0; 
 
 
 // NTCAN STUFF //
@@ -132,20 +132,15 @@ int32_t motor_init(int32_t pdo_filters[],int32_t cfg_filters[]) {
 		printf("Error in set mode \n`"); 
 		return MOTOR_ERROR;        
 	}
-	
-	err |= motor_config_node(MOTOR_EPOS_L_ID);
-	if (err != 0) {
-		printf("Error in Left config node \n`"); 
-		return MOTOR_ERROR;        
-	}
 
-  	err |= motor_config_node(MOTOR_EPOS_R_ID);
-	if (err != 0) {
-		printf("Error in Right config node \n`"); 
-		return MOTOR_ERROR;
+	for(i=1;i<id[0];i++) {
+		err |= motor_config_node(id[i]);
+		if (err != 0) {
+			printf("Error in config node: %d \n",id[i]); 
+			return MOTOR_ERROR;        
+		}
 	}
-
-	return 0;
+  		return 0;
 }
 
 

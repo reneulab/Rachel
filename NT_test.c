@@ -52,10 +52,12 @@ int main(void) {
 				NMT_TX + MOTOR_EPOS_L_ID,
 				SDO_TX + MOTOR_EPOS_L_ID
 			};	
+	
+	int32_t id[3] = {0x03,2,3}; 
 
 	printf("                                     Starting!\n");
 
-	err = motor_init(pdo_filters,cfg_filters);
+	err = motor_init(id,pdo_filters,cfg_filters);
 	if( err != 0) 
 	   { printf("ERROR ON INIT %d \n",err); }
 	printf("                                     Init!\n");
