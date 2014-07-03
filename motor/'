@@ -37,6 +37,7 @@ static int motor_config_node(uint16_t node) {
 		return err;
 	}
 
+
 	// PDO cob id's
 	err |= epos_Receive_PDO_n_Parameter(node, 1, PDO_RX1_ID + node);
 	err |= epos_Receive_PDO_n_Parameter(node, 2, PDO_RX2_ID + node);
@@ -45,25 +46,15 @@ static int motor_config_node(uint16_t node) {
 	err |= epos_Transmit_PDO_n_Parameter(node, 2, PDO_TX2_ID + node);
 
 
-	err |= epos_test(node,0x01); 
 	/*** Communication, from pc to epos ***/
-	// Disable
-
-	err |= epos_Receive_PDO_n_Mapping(node, 1, 0, NULL);
-	err |= epos_Receive_PDO_n_Mapping(node, 2, 0, NULL);
 
 	// PDO RX1 target position (used in pos mode)
 	num_PDOs = 2;
-	// PDO RX1 
 	Epos_pdo_mapping target_pos[] = {
-		{0x607A, 0x00, 32},   // Target Possition
+		{0x2062, 0x00, 32},   // Target Possition
 		{0x6040, 0x00, 16}    // Controlword
 	};
 	err |= epos_Receive_PDO_n_Mapping(node, 1, num_PDOs, target_pos);
-
-	err |= epos_Receive_PDO_n_Mapping(node, 3, 0, NULL);
-	err |= epos_Receive_PDO_n_Mapping(node, 4, 0, NULL);
-
 
 	// PDO RX2 target velocity (used in vel mode)
 	num_PDOs = 2;
@@ -74,12 +65,11 @@ static int motor_config_node(uint16_t node) {
 	err |= epos_Receive_PDO_n_Mapping(node, 2, num_PDOs, target_vel);
 
 	// Disable the rest
+	err |= epos_Receive_PDO_n_Mapping(node, 3, 0, NULL);
+	err |= epos_Receive_PDO_n_Mapping(node, 4, 0, NULL);
 
 
 	/*** Communication, from epos to pc ***/
-
-	err |= epos_Transmit_PDO_n_Mapping(node, 1, 0, NULL);
-	err |= epos_Transmit_PDO_n_Mapping(node, 2, 0, NULL);
 
 	// PDO TX1 Home
 	num_PDOs = 1;
@@ -97,12 +87,8 @@ static int motor_config_node(uint16_t node) {
 	err |= epos_Transmit_PDO_n_Mapping(node, 2, num_PDOs, enc);
 
 	// Disable the rest
-
-	err |= epos_Receive_PDO_n_Mapping(node, 3, 0, NULL);
-	err |= epos_Receive_PDO_n_Mapping(node, 4, 0, NULL);
-
-
-
+	err |= epos_Transmit_PDO_n_Mapping(node, 3, 0, NULL);
+	err |= epos_Transmit_PDO_n_Mapping(node, 4, 0, NULL);
 
 
 	return err;
@@ -115,7 +101,6 @@ int32_t motor_init(int32_t id[],int32_t pdo_filters[],int32_t cfg_filters[]) {
 
 
 // NTCAN STUFF //
-
 	motor_pdo_handle = initNTCAN(NTCAN_BAUD_1000, 
 		NTCAN_MODE_NO_INTERACTION,pdo_filters,NET,
 		NTCAN_MAX_RX_QUEUESIZE,TIMEOUT,

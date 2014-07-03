@@ -2,9 +2,20 @@
 #include "epos.h"
 #include "canopen/NT_SDO.h"
 #include "canopen/ntcan.h"
-
+#include <stdio.h>
+	
 extern NTCAN_HANDLE motor_cfg_handle;
-extern NTCAN_HANDLE motor_pdo_handle;
+
+int32_t epos_test(uint16_t node_id, uint32_t cob) {
+	SDO_data d;
+	d.nodeid = node_id;
+	d.index = 0x1400 ;
+	d.subindex = 0x02;
+	d.size = 1;
+	d.data = cob;
+	return SDO_write(motor_cfg_handle, &d);
+}
+
 
 int32_t epos_Receive_PDO_n_Parameter(uint16_t node_id, uint8_t n, uint32_t cob) {
 	SDO_data d;
@@ -63,17 +74,7 @@ int32_t epos_Transmit_PDO_n_Parameter(uint16_t node_id, uint8_t n, uint32_t cob)
 	d.size = 4;
 	d.data = cob;
 	err |= SDO_write(motor_cfg_handle, &d);
-	
-/*	d.subindex = 0x02;
-	d.size = 1;
-	d.data = 253;
-	err |= SDO_write(motor_cfg_handle, &d);
 
-	d.subindex = 0x03;
-	d.size = 1;
-	d.data = 0x00;
-	err |= SDO_write(motor_cfg_handle, &d);
-*/
 	return err; 
 }
 

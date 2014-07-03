@@ -28,8 +28,6 @@
 #define RTR_ENABLE				0
 #define MAX_TIMEOUT    			50
 
-#define MOTOR_EPOS_R_ID 		0x03
-
 
 /****************************************************************/
 /*             Function: errorCheck		        	*/
@@ -231,7 +229,7 @@ int32_t initNTCAN(uint32_t baud,  uint32_t flags,
           } while( errorCheck(CAN_ID_ADD,result) == 2); 
       if(errorCheck(CAN_ID_ADD,result) != 0) 	// error check
          { return 0xFFFF; }
-   }
+	 }
 /* Flushing FIFO buffer */
    result = canIoctl(handle,NTCAN_IOCTL_FLUSH_RX_FIFO,NULL);   
    if(errorCheck(CAN_IO_CTL,result) != 0) 		// flushing FIFO
@@ -280,18 +278,16 @@ int32_t readNTCAN(NTCAN_HANDLE handle, CMSG *msg, int32_t len)
 		result = canRead(handle,msg, &len, NULL); 
 		timeout++;
 /* If timeout error is recieved repeatly then read is aborted */
-		if(timeout > MAX_TIMEOUT) 
-		{
-      	result = canIoctl(handle, NTCAN_IOCTL_ABORT_RX, NULL);
-        if(errorCheck(CAN_IO_CTL,result != 0))
-        	{ return 1; } 									// error check
-        printf( "Repeated Timeout, read aborted\n");
-        return 2; 
+		if(timeout > MAX_TIMEOUT) {
+      		result = canIoctl(handle, NTCAN_IOCTL_ABORT_RX, NULL);
+        	if(errorCheck(CAN_IO_CTL,result != 0))
+        		{ return 1; } 									// error check
+        	printf( "Repeated Timeout, read aborted\n");
+        	return 2; 
 		}
       } while(errorCheck(CAN_READ,result) == 2); 
 	if(errorCheck(CAN_READ,result) != 0)
 		{ return 1; }  										// error check
-	 
 	return 0; 
 }
 

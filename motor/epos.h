@@ -10,6 +10,9 @@
 
 //uint8_t epos_Error_Register(uint16_t node_id);
 
+int32_t epos_test(uint16_t node_id,uint32_t cob);
+
+
 int32_t epos_Receive_PDO_n_Parameter(uint16_t node_id, uint8_t n, uint32_t cob);
 
 typedef struct {
