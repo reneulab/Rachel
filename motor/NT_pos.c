@@ -16,6 +16,7 @@ int32_t  _pos_goto(int32_t id,int32_t pos) {
 	uint32_t tempID; 
     uint32_t target[2] = 
 		{ 0x00, Switch_On_And_Enable_Operation};  	
+//// changing endiness 
 	tempID = PDO_RX1_ID + id; 
 	target[0] = pos; 
 	changeNTCAN(tempID,target[0],&val[0]);

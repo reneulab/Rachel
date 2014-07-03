@@ -9,7 +9,7 @@ extern NTCAN_HANDLE motor_pdo_handle;
 extern NTCAN_HANDLE motor_cfg_handle; 
 
 
-// Non-exported function
+// Non-exported function  not working
 static int32_t _vel_speed(int32_t vel, uint16_t nodeid) {
  
 	int32_t err = -1;

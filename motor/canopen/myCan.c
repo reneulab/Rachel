@@ -190,8 +190,8 @@ int32_t errorCheck( int32_t command,
              (command == CAN_READ_EVENT)) {
             switch(result) {
 	      case NTCAN_RX_TIMEOUT:
-	        //  printf( "Error, RX timeout\n");
-		  return 2; break; }
+//	      		printf( "Error, RX timeout\n");
+		  		return 2; break; }
          }
          
 

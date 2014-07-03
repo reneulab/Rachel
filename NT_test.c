@@ -6,15 +6,12 @@
 #include "motor/canopen/NT_SDO.h"
 #include "motor/canopen/NT_PDO.h"
 
-#include <time.h>
+#include <unistd.h> 
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <inttypes.h>
-#include <stdbool.h>
 
 ///// Used for test /////
-#define TIMEOUT 1000
+#define TIMEOUT 10000
 #define NODE 	4
 
 /* 	Order of main 
@@ -22,11 +19,11 @@
 	YOUR_CODE   (motor_halt is in  velocity mode)
 	motor_disable	motor_close
 */
-
+///// ERROR with RXTIMEOUT 
 int32_t main(void) {
 	
-	int32_t err;
-	int32_t i = 0; 
+	int8_t i = 0; 
+	int8_t err = 0; 
 /// Used to test timing ///
 //	int64_t timeB = 0;
 //	int64_t timeA = 0;
@@ -58,15 +55,11 @@ int32_t main(void) {
 /********************************************************/
 	printf("          Running Program! \n");
 
-	err = motor_init(id,pdo_filters,cfg_filters);
-	if( err != 0) 
-	   { printf("ERROR ON INIT %d \n",err); }
+	motor_init(id,pdo_filters,cfg_filters);
 	printf("          Init!!!!!!!!!!!! \n");
 	sleep(4);
 /*********************************************************/
-	err = motor_enable(id);
-	if(err != 0)
-	   { printf("ERROR ON ENABLE %d \n",err); }
+	motor_enable(id);
 	sleep(1);
 	printf("          Starting now!!!! \n");
 /*********************************************************/
@@ -74,8 +67,8 @@ int32_t main(void) {
 	for(i=0;i<2;i++) {
 		sleep(2);
 		motor_rad =(3.14159/2);
-		err = epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
-//		err |= pos_rotate_rad(id,motor_rad);
+//		pos_rotate_rad(id,motor_rad);
+		epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
 		printf("motor rad is %d \n",(int32_t)motor_rad); 
 		sleep(2); 
 		err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
@@ -83,34 +76,31 @@ int32_t main(void) {
 		sleep(2);
 
 		motor_rad =(3.14159);
-		err = epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
-//		err |= pos_rotate_rad(id,motor_rad);
+		epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
+//		pos_rotate_rad(id,motor_rad);
 		printf("motor rad is %d \n",(int32_t)motor_rad); 
 		sleep(2); 
 		err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
 		printf("2 pos left = %d \n",pos_left ); 
+		if(err != 0) {
+			printf("Error in ppos_read \n"); 
+		};
 		sleep(2); 
 	}		
 /********************************************************/
 	printf("          Ending!!!!!!!!!! \n");
 	printf("          HALT!!!!!!!!!!!! \n  ");
-	err = motor_halt(id);
-	if(err !=0 )
-		{ printf("Error on HALT %d \n",err); }
+	motor_halt(id);
 	sleep(2);
 
-	err = motor_disable(id);
+	motor_disable(id);
 	printf("        DISABLE!!!!!!!!! \n"); 	
-	if(err != 0) 
-	   	{ printf("error on disable %d \n",err); }
 	sleep(4);
 
 	printf("          CLOSE!!!!!!!!!!! \n"); 
-	err = motor_close(pdo_filters,cfg_filters);
-	if(err != 0) 
-	   	{ printf("ERROR ON CLOSE %d \n",err); }
+	motor_close(pdo_filters,cfg_filters);
 	sleep(2);
-	printf("Goodbye </3 %15d \n");
+	printf("Goodbye </3 \n");
 
 	return 0;
 }

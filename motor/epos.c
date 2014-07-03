@@ -6,6 +6,7 @@
 	
 extern NTCAN_HANDLE motor_cfg_handle;
 
+//// testing PDO set transmission mode
 int32_t epos_test(uint16_t node_id, uint32_t cob) {
 	SDO_data d;
 	d.nodeid = node_id;
