@@ -275,7 +275,7 @@ int32_t readNTCAN(NTCAN_HANDLE handle, CMSG *msg, int32_t len)
    int32_t 			timeout=0; 
 /* Reading Object of NTCAN device */  
 	do {
-		result = canRead(handle,msg, &len, NULL); 
+		result = canRead(handle,msg, &len, 0); 
 		timeout++;
 /* If timeout error is recieved repeatly then read is aborted */
 		if(timeout > MAX_TIMEOUT) {

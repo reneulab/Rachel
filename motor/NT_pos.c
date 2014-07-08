@@ -8,7 +8,7 @@
 #include <inttypes.h>
 #include <math.h>
 extern NTCAN_HANDLE motor_pdo_handle;
-
+/* not working at all */
 int32_t  _pos_goto(int32_t id,int32_t pos) {
 	int32_t err = 0; 
 	CMSG val[2];

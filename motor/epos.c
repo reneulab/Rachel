@@ -5,9 +5,10 @@
 #include <stdio.h>
 	
 extern NTCAN_HANDLE motor_cfg_handle;
+extern NTCAN_HANDLE motor_pdo_handle;
 
 //// testing PDO set transmission mode
-int32_t epos_test(uint16_t node_id, uint32_t cob) {
+int32_t epos_PDO_Set_Transmission(uint16_t node_id, uint32_t cob) {
 	SDO_data d;
 	d.nodeid = node_id;
 	d.index = 0x1400 ;
@@ -42,20 +43,20 @@ int32_t epos_Receive_PDO_n_Mapping(uint16_t node_id,  uint8_t n, uint8_t num_obj
 
 	err = SDO_write(motor_cfg_handle, &d);
 	if (err != 0) {
-		return err;
+			return err;
 	}
 
 	// Write objects
 	d.size = 4;
 	for(i=0; i<num_objects; i++) {
 		Epos_pdo_mapping obj = objects[i];
-
+	
 		d.subindex = i+1;
 		d.data = ((uint32_t)obj.index << 16) | (obj.subindex<<8) | (obj.length);
 		err = SDO_write(motor_cfg_handle, &d);
 		if (err != 0) {
 			return err;
-		}
+		}		
 	}
 
 	// Set Correct number of objects
@@ -67,16 +68,13 @@ int32_t epos_Receive_PDO_n_Mapping(uint16_t node_id,  uint8_t n, uint8_t num_obj
 
 
 int32_t epos_Transmit_PDO_n_Parameter(uint16_t node_id, uint8_t n, uint32_t cob) {
-	int8_t err = 0; 
 	SDO_data d;
 	d.nodeid = node_id;
 	d.index = 0x1800 + n-1;
 	d.subindex = 0x01;
 	d.size = 4;
 	d.data = cob;
-	err |= SDO_write(motor_cfg_handle, &d);
-
-	return err; 
+	return SDO_write(motor_cfg_handle, &d);
 }
 
 
@@ -100,7 +98,6 @@ int32_t epos_Transmit_PDO_n_Mapping(uint16_t node_id, uint8_t n, uint8_t num_obj
 	d.size = 4;
 	for(i=0; i<num_objects; i++) {
 		Epos_pdo_mapping obj = objects[i];
-
 		d.subindex = i+1;
 		d.data = ((uint32_t)obj.index << 16) | (obj.subindex<<8) | (obj.length);
 		err = SDO_write(motor_cfg_handle, &d);
@@ -200,7 +197,7 @@ int32_t epos_Position_Window_Time(uint16_t node_id, uint32_t ms) {
 	return SDO_write(motor_cfg_handle, &d);
 }
 
-
+/* not working */
 int32_t epos_Target_Position(uint16_t node_id, int32_t enc) {
 	SDO_data d;
 	d.nodeid = node_id;
@@ -318,13 +315,14 @@ int32_t epos_Max_Acceleration(uint16_t node_id, uint32_t value) {
 	return SDO_write(motor_cfg_handle, &d);
 }
 
-//uint32_t epos_Read_Position(uint16_t node_id) {
-//	SDO_data d;
-//	d.nodeid = node_id;
-//	d.index = 0x6064;
-//	d.subindex = 0x00;
-//	d.size = 4;//SDO_type_uint8;
-//	SDO_read(motor_cfg_handle, &d);
+/* Not working */
+int32_t epos_Read_Position(uint16_t node_id) {
+	SDO_data d;
+	d.nodeid = node_id;
+	d.index = 0x6064;
+	d.subindex = 0x00;
+	d.size = 4;//SDO_type_uint8;
+	return SDO_read(motor_cfg_handle, &d);
+		
 //	return *(d.data.uint32_t);
-//return 0;
-//}
+}

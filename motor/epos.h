@@ -45,7 +45,7 @@ enum Epos_ctrl {
 	Disable_Voltage = 0x00,
 	Quickstop = 0x02,
 	Disable_Operation = 0x07,
-	Enable_Operation = 0x0f,
+	Enable_Operation = 0x0f
 };
 
 // Operatin Mode-specific
@@ -63,12 +63,12 @@ enum Epos_mode {
 	Homing_Mode = 6,
 	Profile_Velocity_Mode = 3,
 	Profile_Position_Mode = 1,
-	Position_Mode = 255,
-	Velocity_Mode = -2,
-	Current_Mode = -3,
-	Diagnostic_Mode = -4,
-	Master_Encoder_Mode = -5,
-	Step_Direction_Mode = -6
+	Position_Mode = 0xFF,
+	Velocity_Mode = 0xFE,
+	Current_Mode = 0xFD,
+	Diagnostic_Mode = 0xFC,
+	Master_Encoder_Mode = 0xFB,
+	Step_Direction_Mode = 0xFA
 };
 
 int32_t epos_Modes_of_Operation(uint16_t node_id, enum Epos_mode mode);
@@ -109,6 +109,6 @@ int32_t epos_Motion_Profile_Type(uint16_t node_id, enum Epos_Profile_Type mode);
 
 int32_t epos_Max_Acceleration(uint16_t node_id, uint32_t value);
 
-//uint32_t epos_Read_Position(uint16_t node_id);
+int32_t epos_Read_Position(uint16_t node_id);
 
 #endif

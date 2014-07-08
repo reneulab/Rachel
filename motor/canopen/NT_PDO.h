@@ -15,7 +15,7 @@ enum PDO_n_ID {
 /**
  * \return    0 on sucsess, -1 on error
  */
-int32_t PDO_send(NTCAN_HANDLE handle, uint16_t pdo_id, uint8_t length,CMSG *msg);
+int32_t PDO_send(NTCAN_HANDLE handle, uint16_t pdo_id, int32_t pos);
 
 
 /**

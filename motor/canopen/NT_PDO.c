@@ -4,9 +4,38 @@
 #include <string.h>
 #include "ntcan.h"
 
-int PDO_send(NTCAN_HANDLE handle, uint16_t pdo_id, uint8_t len, CMSG *msg) {
+int PDO_send(NTCAN_HANDLE handle, uint16_t pdo_id, int32_t pos) {
+	int32_t len;
+	CMSG msg; 
 
-	return writeNTCAN(handle,len,msg);
+	len = 1;  
+	msg.id = pdo_id; 
+	msg.len = 8;
+// endiness correct canopne alway LSB first 	
+	msg.data[0] = pos & 255;
+	msg.data[1] = (pos >> 8) & 255; 
+	msg.data[2] = (pos >> 16) & 255; 
+	msg.data[3] = (pos >> 24) & 255; 
+	
+	msg.data[4] = 0x00;                 /// 00000000 00010000
+	msg.data[5] = 0x00;
+	
+	msg.data[6] = 0x00;
+	msg.data[7] = 0x00;
+	printf("PDO_send id %x \n",msg.id);  
+	
+	printf("PDO_send data[0] %x \n",msg.data[0]); 
+	printf("PDO_send data[1] %x \n",msg.data[1]); 
+	printf("PDO_send data[2] %x \n",msg.data[2]); 
+	printf("PDO_send data[3] %x \n",msg.data[3]); 
+	
+	printf("PDO_send data[4] %x \n",msg.data[4]); 
+	printf("PDO_send data[5] %x \n",msg.data[5]); 
+	
+	printf("PDO_send data[6] %x \n",msg.data[6]); 
+	printf("PDO_send data[7] %x \n",msg.data[7]); 
+
+	return writeNTCAN(handle,len,&msg);
 }
 
 
@@ -16,6 +45,10 @@ int PDO_read(NTCAN_HANDLE handle,CMSG* pdo) {
 	int32_t err, func;
 	int32_t size = 1;
 	CMSG f; 
+
+//	f.id = 0x283; 
+//	f.len = 8; 
+
 	err = readNTCAN(handle, &f,size); 
 	if(err != 0) {
 		printf("Read error, or no data \n");

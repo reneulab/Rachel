@@ -24,6 +24,9 @@ typedef struct {
 	uint32_t data; //!< Data and type info
 } SDO_data;
 
+int32_t SDO_read(int32_t handle,SDO_data* d); 
+
+
 /**
  * Sends an SDO_data stuct on the can-bus.
  * \return  0 on success, -1 on error, -2 on timeout

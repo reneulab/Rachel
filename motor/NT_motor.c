@@ -16,8 +16,8 @@
 #define NET 	0
 #define TIMEOUT 1000
 
-int32_t motor_pdo_handle; //!< Process CAN-connection.
-int32_t motor_cfg_handle; //!< Configuration CAN-connection.
+int32_t motor_pdo_handle = -1; //!< Process CAN-connection.
+int32_t motor_cfg_handle = -1; //!< Configuration CAN-connection.
 
 
 static int8_t motor_config_node(uint16_t node) {
@@ -38,61 +38,62 @@ static int8_t motor_config_node(uint16_t node) {
 	};
 
 	// PDO cob id's
-	err |= epos_Receive_PDO_n_Parameter(node, 1, PDO_RX1_ID + node);
-	err |= epos_Receive_PDO_n_Parameter(node, 2, PDO_RX2_ID + node);
+	err |= epos_Receive_PDO_n_Parameter(node,1,PDO_RX1_ID + node);
+	err |= epos_Receive_PDO_n_Parameter(node,2,PDO_RX2_ID + node);
 	if(err != 0) {
 		printf("Error in PDO Receive Parameter \n"); 
 	};
-	err |= epos_Transmit_PDO_n_Parameter(node, 1, PDO_TX1_ID + node);
-	err |= epos_Transmit_PDO_n_Parameter(node, 2, PDO_TX2_ID + node);
+	err |= epos_Transmit_PDO_n_Parameter(node,1,PDO_TX1_ID + node);
+	err |= epos_Transmit_PDO_n_Parameter(node,2,PDO_TX2_ID + node);
 	if(err != 0) {
 		printf("Error in PDO Transmit Parameter \n"); 
 	};
-	err |= epos_test(node,0x01);
+//	err |= epos_test(node,0x01);
 /**** Starting Mapping ****/ 
 	/*** Communication, from pc to epos RX ***/
-	
+	// Use epos_firware page 37	
 	// PDO RX1 target position (used in pos mode)
 	num_PDOs = 2;
-	// PDO RX1 
+	// PDO RX1
 	Epos_pdo_mapping target_pos[] = {
-		{0x607A, 0x00, 32},   // Target Possition
+		{0x2062, 0x00, 32},   // Target Position
 		{0x6040, 0x00, 16}    // Controlword
 		};
-	err |= epos_Receive_PDO_n_Mapping(node, 1, num_PDOs, target_pos);
-	// PDO RX2 target velocity (used in vel mode)
+	err |= epos_Receive_PDO_n_Mapping(node,1,num_PDOs,target_pos);
+		if(err != 0) {
+		printf("Error in PDO_RX Receive Mapping \n");
+	};// PDO RX2 target velocity (used in vel mode)
 	num_PDOs = 2;
 	Epos_pdo_mapping target_vel[] = {
 		{0x206B, 0x00, 32},  // Target Velocity
 		{0x6040, 0x00, 16}   // Controlword
 	};
-	err |= epos_Receive_PDO_n_Mapping(node, 2, num_PDOs, target_vel);
-	err |= epos_Receive_PDO_n_Mapping(node, 3, 0, NULL);
-	err |= epos_Receive_PDO_n_Mapping(node, 4, 0, NULL);
+	err |= epos_Receive_PDO_n_Mapping(node,2,num_PDOs,target_vel);
+
+	err |= epos_Receive_PDO_n_Mapping(node,3,0,NULL);
+	err |= epos_Receive_PDO_n_Mapping(node,4,0,NULL);
 	if(err != 0) {
 		printf("Error in PDO_RX2 Receive Mapping \n");
 	};
     /*** Communication, from epos to pc TX ***/
 
 	// PDO TX1 Home
-	num_PDOs = 1;
-	Epos_pdo_mapping status[] = {
+	num_PDOs = 2;
+	Epos_pdo_mapping receive_pos[] = {
+		{0x6062, 0x00, 32},  // Position Actual value
 		{0x6041, 0x00, 16}   // Statusword
 		};
-	err |= epos_Transmit_PDO_n_Mapping(node, 1, num_PDOs, status);
+	err |= epos_Transmit_PDO_n_Mapping(node,1,num_PDOs,receive_pos);
 
 	// PDO TX2 Position and speed
 	num_PDOs = 2;
-	Epos_pdo_mapping enc[] = {
-		{0x6064, 0x00, 32},  // Position Actual value
-		{0x606C, 0x00, 32}
+	Epos_pdo_mapping recieve_vel[] = {
+		{0x606B, 0x00, 32},	 // Velocity Actural value 
+		{0x6041, 0x00, 16}   // Statusword
 		};
-	err |= epos_Transmit_PDO_n_Mapping(node, 2, num_PDOs, enc);
+	err |= epos_Transmit_PDO_n_Mapping(node,2,num_PDOs,recieve_vel);
 
-	// Disable the rest  test 1 2 later
-/*	err |= epos_Receive_PDO_n_Mapping(node, 1, 0, NULL);
-	err |= epos_Receive_PDO_n_Mapping(node, 2, 0, NULL);
-*/	err |= epos_Receive_PDO_n_Mapping(node, 3, 0, NULL);
+	err |= epos_Receive_PDO_n_Mapping(node, 3, 0, NULL);
 	err |= epos_Receive_PDO_n_Mapping(node, 4, 0, NULL);
 	if(err != 0) {
 		printf("Error in PDO_TX  Mapping \n");
@@ -149,7 +150,7 @@ int8_t motor_init(int32_t id[],int32_t pdo_filters[],int32_t cfg_filters[]) {
 			return MOTOR_ERROR;        
 		}
 	}
-  		return 0;
+  		return motor_pdo_handle;
 }
 
 

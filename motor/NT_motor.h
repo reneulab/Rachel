@@ -30,8 +30,8 @@
 
 // Implemented subset of Epos_mode from epos.h
 enum Motor_mode {
-	Motor_mode_Velocity = 3,
-	Motor_mode_Position = 255,
+	Motor_mode_Velocity = 0xFE,
+	Motor_mode_Position = 0xFF
 };
 
 

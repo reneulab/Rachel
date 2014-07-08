@@ -14,6 +14,9 @@
 #define TIMEOUT 10000
 #define NODE 	4
 
+extern NTCAN_HANDLE motor_cfg_handle; 
+extern NTCAN_HANDLE motor_pdo_handle; 
+
 /* 	Order of main 
 	motor_init	motor_enable
 	YOUR_CODE   (motor_halt is in  velocity mode)
@@ -24,6 +27,7 @@ int32_t main(void) {
 	
 	int8_t i = 0; 
 	int8_t err = 0; 
+	int32_t input = 0; 
 /// Used to test timing ///
 //	int64_t timeB = 0;
 //	int64_t timeA = 0;
@@ -65,28 +69,34 @@ int32_t main(void) {
 /*********************************************************/
 
 	for(i=0;i<2;i++) {
+	
 		sleep(2);
-		motor_rad =(3.14159/2);
-//		pos_rotate_rad(id,motor_rad);
-		epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
-		printf("motor rad is %d \n",(int32_t)motor_rad); 
-		sleep(2); 
-		err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
-		printf("pos left = %d \n",pos_right ); 
-		sleep(2);
-
-		motor_rad =(3.14159);
-		epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
-//		pos_rotate_rad(id,motor_rad);
-		printf("motor rad is %d \n",(int32_t)motor_rad); 
-		sleep(2); 
-		err |= ppos_read(&pos_left,&vel_left,&pos_right,&vel_right);
-		printf("2 pos left = %d \n",pos_left ); 
+		motor_rad =(3.14159/4);
+		printf("motor rad is %x \n",(int32_t)((295*4000/(2*3.14159))*motor_rad)); 
+		err = PDO_send(motor_pdo_handle,0x200+NODE,(int32_t)((295*4000/(2*3.14159))*motor_rad)); 
 		if(err != 0) {
 			printf("Error in ppos_read \n"); 
 		};
-		sleep(2); 
+		sleep(4); 
+		
+/*		printf("now epos \n"); 
+		epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
+		sleep(4);  
+*/		
+		motor_rad =(3.14159);
+		input = (int32_t)((295*4000/(2*3.14159))*motor_rad);		
+		printf("motor rad is %x \n",input+0x100000); 
+		err = PDO_send(motor_pdo_handle,0x200+NODE,input + 0x100000); 
+		if(err != 0) {
+			printf("Error in ppos_read \n"); 
+		};
+		sleep(4); 
+		
+/*		printf("now epos \n"); 
+		epos_Position_Mode_Setting_Value(NODE,(295*4000/(2*3.14159))*motor_rad);
+*/		sleep(2); 
 	}		
+	
 /********************************************************/
 	printf("          Ending!!!!!!!!!! \n");
 	printf("          HALT!!!!!!!!!!!! \n  ");
